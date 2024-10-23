@@ -1,0 +1,16 @@
+
+@prefix :     <https://ontology.CapIT.es/logistics/decarbomile/Classification#> .# needs changes
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+# Time classification
+
+:TimeClassification a owl:Class ;
+  rdfs:subClassOf <https://vocab.plataformasimple.es/def/logistics/federated/Classifications#> ;
+  rdfs:comment "Time classification can be either Planned, Estimated, Expected, Actual, Requested." ;
+  rdfs:label "Time Classification" ;
+.
+:Actual a owl:Class ;
+  rdfs:subClassOf :TimeClassification ;
+  rdfs:label "Actual" ;
+.

@@ -1,0 +1,53 @@
+name: Generate Widoco Documentation for Multiple Ontologies
+
+on:
+  push:
+    branches:
+      - main  # Run the workflow when changes are pushed to the main branch
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3  # Latest version (uses Node 20 automatically)
+
+      - name: Set up Java environment
+        uses: actions/setup-java@v3  # Latest version (uses Node 20 automatically)
+        with:
+          distribution: 'temurin'
+          java-version: '11'  # Widoco needs Java 11 or higher
+
+      - name: Download Widoco
+        run: |
+          wget https://github.com/dgarijo/Widoco/releases/download/v1.4.25/widoco-1.4.25-jar-with-dependencies_JDK-17.jar -O widoco.jar
+
+
+      - name: Generate HTML documentation for each ontology
+        run: |
+          # Find all .ttl files in the Ontologies folder and subfolders
+          find Ontology/ -name '*.ttl' | while read ont_file; do
+          
+            # Extract the ontology name without the file extension
+            ont_name=$(basename "$ont_file" .ttl)
+
+            # Extract the category subfolder (e.g., Category1, Category2)
+            category_folder=$(dirname "$ont_file" | sed 's/Ontologies\///')
+
+            # Create an output folder in website-ontologies for each category
+            output_folder="Website-Ontology/$category_folder/$ont_name"
+
+            # Log what will be generated
+            echo "Generating documentation for: $ont_file"
+            echo "Output folder: $output_folder"
+            
+            # Run Widoco to generate HTML documentation
+            java -jar widoco.jar -ontFile "$ont_file" -outFolder "$output_folder" -rewriteAll -includeAllSections -logLevel info -createFolder
+          done
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3  # This action deploys to GitHub Pages
+        with:
+          github_token: ${{ secrets.GH_PAT }}
+          publish_dir: ./Website-Ontology  # Ensure folder name matches
