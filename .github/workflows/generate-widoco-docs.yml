@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - main  # Run the workflow when changes are pushed to the main branch
+    paths:
+      - 'Ontology/**/*.ttl'  # Only run the workflow when .ttl files are modified
 
 jobs:
   build:
