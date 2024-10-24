@@ -23,19 +23,15 @@ jobs:
         run: |
           wget https://github.com/dgarijo/Widoco/releases/download/v1.4.25/widoco-1.4.25-jar-with-dependencies_JDK-17.jar -O widoco.jar
 
-
       - name: Generate HTML documentation for each ontology
         run: |
           # Find all .ttl files in the Ontologies folder and subfolders
           find Ontology/ -name '*.ttl' | while read ont_file; do
-          
             # Extract the ontology name without the file extension
             ont_name=$(basename "$ont_file" .ttl)
-
             # Extract the category subfolder (e.g., Category1, Category2)
-            category_folder=$(dirname "$ont_file" | sed 's/Ontologies\///')
-
-            # Create an output folder in website-ontologies for each category
+            category_folder=$(dirname "$ont_file" | sed 's/Ontology\///')
+            # Create an output folder in Website-Ontology for each category
             output_folder="Website-Ontology/$category_folder/$ont_name"
 
             # Log what will be generated
@@ -43,8 +39,13 @@ jobs:
             echo "Output folder: $output_folder"
             
             # Run Widoco to generate HTML documentation
-            java -jar widoco.jar -ontFile "$ont_file" -outFolder "$output_folder" -rewriteAll -includeAllSections -logLevel info -createFolder
+            java -jar widoco.jar -ontFile "$ont_file" -outFolder "$output_folder" -rewriteAll -logLevel info -createFolder
           done
+
+      - name: Disable Jekyll
+        run: |
+          # Disable Jekyll by creating an empty .nojekyll file in the output directory
+          touch Website-Ontology/.nojekyll
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3  # This action deploys to GitHub Pages
