@@ -33,13 +33,20 @@ jobs:
             category_folder=$(dirname "$ont_file" | sed 's/Ontology\///')
             # Create an output folder in Website-Ontology for each category
             output_folder="Website-Ontology/$category_folder/$ont_name"
+            # Look for a Widoco configuration file in the same folder as the ontology
+            conf_file=$(dirname "$ont_file")/Widoco-Conf
 
             # Log what will be generated
             echo "Generating documentation for: $ont_file"
             echo "Output folder: $output_folder"
-            
-            # Run Widoco to generate HTML documentation
-            java -jar widoco.jar -ontFile "$ont_file" -outFolder "$output_folder" -rewriteAll -logLevel info -createFolder
+            echo "Using Widoco-Conf: $conf_file (if it exists)"
+
+            # Run Widoco to generate HTML documentation with additional configuration and options
+            if [ -f "$conf_file" ]; then
+              java -jar widoco.jar -ontFile "$ont_file" -outFolder "$output_folder" -confFile "$conf_file" -rewriteAll -webVowl -oops -includeIndividuals -includeImportedOntologies -htaccess -displayOntologySerializations -uniteSections -createFolder
+            else
+              java -jar widoco.jar -ontFile "$ont_file" -outFolder "$output_folder" -rewriteAll -webVowl -oops -includeIndividuals -includeImportedOntologies -htaccess -displayOntologySerializations -uniteSections -createFolder
+            fi
           done
 
       - name: Disable Jekyll
